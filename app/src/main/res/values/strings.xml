@@ -7,6 +7,12 @@
     <string name="item_info_string">INFO</string>
     <string name="item_settings_string">SETTINGS</string>
 
+    <!-- Home -->
+    <string name="button_choose_dir_string">Choose directory</string>
+    <string name="button_random_background_string">Set random background</string>
+    <string name="textview_current_wallpaper_string">Current wallpaper name:\n%s</string>
+    
+    
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <!-- Preference Titles -->
