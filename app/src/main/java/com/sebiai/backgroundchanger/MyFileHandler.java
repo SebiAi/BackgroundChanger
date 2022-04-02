@@ -5,14 +5,11 @@ import static com.sebiai.backgroundchanger.MyApplicationHelper.getMyApplication;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.DocumentsContract;
-import android.util.Log;
 
 import androidx.documentfile.provider.DocumentFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -34,6 +31,9 @@ public class MyFileHandler {
                 DocumentsContract.Document.COLUMN_DISPLAY_NAME,
                 DocumentsContract.Document.COLUMN_MIME_TYPE
         }, null, null, null);
+
+        if (c == null)
+            return uris;
 
         // Get files
         while (c.moveToNext()) {
@@ -78,5 +78,12 @@ public class MyFileHandler {
         InputStream stream = context.getContentResolver().openInputStream(file.getUri());
         WallpaperManager.getInstance(context).setStream(stream);
         stream.close();
+    }
+
+    public static boolean isWallpaperDirValid(Context context) {
+        if (getMyApplication(context).wallpaperDir == null)
+            return false;
+        ArrayList<Uri> uris = getFiles(context, getMyApplication(context).wallpaperDir);
+        return uris.size() != 0;
     }
 }

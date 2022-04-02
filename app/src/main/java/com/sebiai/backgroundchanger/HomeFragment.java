@@ -2,29 +2,24 @@ package com.sebiai.backgroundchanger;
 
 import static com.sebiai.backgroundchanger.MyApplicationHelper.getMyApplication;
 
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,14 +31,22 @@ public class HomeFragment extends Fragment {
     private TextView textViewCurrentWallpaper;
     private ActivityResultLauncher<Uri> uriActivityResultLauncher;
 
+    SharedPreferences sharedPreferences;
+    private final String PREFERENCEKEY_WALLPAPER_DIR = "PREFERENCEKEY_WALLPAPER_DIR";
+    private final String PREFERENCEKEY_LAST_WALLPAPER_NAME = "PREFERENCEKEY_LAST_WALLPAPER_NAME";
+
     public HomeFragment() {
         // Required empty public constructor
         uriActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.OpenDocumentTree(), result -> {
             if (result == null)
                 return;
 
-            // Save globally
+            // Make persistent
+            requireActivity().getContentResolver().takePersistableUriPermission(result, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            // Save globally and in preferences
             getMyApplication(requireContext()).wallpaperDir = result;
+            sharedPreferences.edit().putString(PREFERENCEKEY_WALLPAPER_DIR, result.toString()).apply();
 
             // Enable button
             buttonSetRandomBackground.setEnabled(true);
@@ -80,6 +83,17 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setup();
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity());
+        // Load Uri
+        if (sharedPreferences.contains(PREFERENCEKEY_WALLPAPER_DIR)) {
+            getMyApplication(requireContext()).wallpaperDir = Uri.parse(sharedPreferences.getString(PREFERENCEKEY_WALLPAPER_DIR, null));
+            buttonSetRandomBackground.setEnabled(true);
+        }
+        // Load last set wallpaper name
+        if (sharedPreferences.contains(PREFERENCEKEY_LAST_WALLPAPER_NAME)) {
+            textViewCurrentWallpaper.setText(String.format(getString(R.string.textview_current_wallpaper_string), sharedPreferences.getString(PREFERENCEKEY_LAST_WALLPAPER_NAME, "-")));
+        }
     }
 
     private void setup() {
@@ -89,11 +103,24 @@ public class HomeFragment extends Fragment {
         buttonSetRandomBackground = requireView().findViewById(R.id.button_set_random_background);
         buttonSetRandomBackground.setOnClickListener(v -> {
             DocumentFile file = MyFileHandler.setRandomFileAsWallpaper(requireContext());
-            if (file != null)
-                textViewCurrentWallpaper.setText(String.format(getString(R.string.textview_current_wallpaper_string), file.getName()));
+            if (file != null) {
+                String fileName = file.getName();
+                textViewCurrentWallpaper.setText(String.format(getString(R.string.textview_current_wallpaper_string), fileName));
+                sharedPreferences.edit().putString(PREFERENCEKEY_LAST_WALLPAPER_NAME, fileName).apply();
+            }
         });
 
         textViewCurrentWallpaper = requireView().findViewById(R.id.textview_current_wallpaper);
         textViewCurrentWallpaper.setText(String.format(getString(R.string.textview_current_wallpaper_string), "-"));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Check if uri is still valid
+        if (!MyFileHandler.isWallpaperDirValid(requireContext())) {
+            buttonSetRandomBackground.setEnabled(false);
+        }
     }
 }

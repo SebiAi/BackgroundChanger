@@ -10,7 +10,7 @@
     <!-- Home -->
     <string name="button_choose_dir_string">Choose directory</string>
     <string name="button_random_background_string">Set random background</string>
-    <string name="textview_current_wallpaper_string">Current wallpaper name:\n%s</string>
+    <string name="textview_current_wallpaper_string">Last set wallpaper name:\n%s</string>
     
     
     <!-- TODO: Remove or change this placeholder text -->
