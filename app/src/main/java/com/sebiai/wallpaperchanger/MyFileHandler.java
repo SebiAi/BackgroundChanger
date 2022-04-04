@@ -1,6 +1,6 @@
-package com.sebiai.backgroundchanger;
+package com.sebiai.wallpaperchanger;
 
-import static com.sebiai.backgroundchanger.MyApplicationHelper.getMyApplication;
+import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
 
 import android.app.WallpaperManager;
 import android.content.Context;

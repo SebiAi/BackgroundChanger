@@ -1,6 +1,6 @@
-package com.sebiai.backgroundchanger;
+package com.sebiai.wallpaperchanger;
 
-import static com.sebiai.backgroundchanger.MyApplicationHelper.getMyApplication;
+import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,7 +27,7 @@ import android.widget.TextView;
 public class HomeFragment extends Fragment {
 
     private Button buttonChooseDir;
-    private Button buttonSetRandomBackground;
+    private Button buttonSetRandomWallpaper;
     private TextView textViewCurrentWallpaper;
     private ActivityResultLauncher<Uri> uriActivityResultLauncher;
 
@@ -49,7 +49,7 @@ public class HomeFragment extends Fragment {
             sharedPreferences.edit().putString(PREFERENCEKEY_WALLPAPER_DIR, result.toString()).apply();
 
             // Enable button
-            buttonSetRandomBackground.setEnabled(true);
+            buttonSetRandomWallpaper.setEnabled(true);
 
 //                final ArrayList<Uri> uris = MyFileHandler.getFiles(requireContext(), result);
 //
@@ -88,7 +88,7 @@ public class HomeFragment extends Fragment {
         // Load Uri
         if (sharedPreferences.contains(PREFERENCEKEY_WALLPAPER_DIR)) {
             getMyApplication(requireContext()).wallpaperDir = Uri.parse(sharedPreferences.getString(PREFERENCEKEY_WALLPAPER_DIR, null));
-            buttonSetRandomBackground.setEnabled(true);
+            buttonSetRandomWallpaper.setEnabled(true);
         }
         // Load last set wallpaper name
         if (sharedPreferences.contains(PREFERENCEKEY_LAST_WALLPAPER_NAME)) {
@@ -100,8 +100,8 @@ public class HomeFragment extends Fragment {
         buttonChooseDir = requireView().findViewById(R.id.button_choose_dir);
         buttonChooseDir.setOnClickListener(v -> uriActivityResultLauncher.launch(Uri.parse("image/*")));
 
-        buttonSetRandomBackground = requireView().findViewById(R.id.button_set_random_background);
-        buttonSetRandomBackground.setOnClickListener(v -> {
+        buttonSetRandomWallpaper = requireView().findViewById(R.id.button_set_random_wallpaper);
+        buttonSetRandomWallpaper.setOnClickListener(v -> {
             DocumentFile file = MyFileHandler.setRandomFileAsWallpaper(requireContext());
             if (file != null) {
                 String fileName = file.getName();
@@ -120,7 +120,7 @@ public class HomeFragment extends Fragment {
 
         // Check if uri is still valid
         if (!MyFileHandler.isWallpaperDirValid(requireContext())) {
-            buttonSetRandomBackground.setEnabled(false);
+            buttonSetRandomWallpaper.setEnabled(false);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.sebiai.backgroundchanger;
+package com.sebiai.wallpaperchanger;
 
 import org.junit.Test;
 

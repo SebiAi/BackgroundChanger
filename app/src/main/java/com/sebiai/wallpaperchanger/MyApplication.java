@@ -1,4 +1,4 @@
-package com.sebiai.backgroundchanger;
+package com.sebiai.wallpaperchanger;
 
 import android.app.Application;
 import android.net.Uri;

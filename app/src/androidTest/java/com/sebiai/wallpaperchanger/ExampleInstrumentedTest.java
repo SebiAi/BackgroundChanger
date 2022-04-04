@@ -1,4 +1,4 @@
-package com.sebiai.backgroundchanger;
+package com.sebiai.wallpaperchanger;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.sebiai.backgroundchanger", appContext.getPackageName());
+        assertEquals("com.sebiai.wallpaperchanger", appContext.getPackageName());
     }
 }

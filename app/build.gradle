@@ -3,10 +3,18 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file(System.getenv("ANDROID_STORE_FILE"))
+            storePassword System.getenv("ANDROID_STORE_PASSWORD")
+            keyPassword System.getenv("ANDROID_STORE_PASSWORD")
+            keyAlias System.getenv("ANDROID_STORE_ALIAS")
+        }
+    }
     compileSdk 31
 
     defaultConfig {
-        applicationId "com.sebiai.backgroundchanger"
+        applicationId "com.sebiai.wallpaperchanger"
         minSdk 29
         targetSdk 29
         versionCode 1

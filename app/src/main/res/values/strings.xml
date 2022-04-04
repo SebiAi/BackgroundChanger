@@ -1,6 +1,6 @@
 <resources>
     <!-- Global -->
-    <string name="app_name">Background Changer</string>
+    <string name="app_name">Wallpaper Changer</string>
 
     <!-- Bottom Navigation -->
     <string name="item_home_string">HOME</string>
@@ -9,7 +9,7 @@
 
     <!-- Home -->
     <string name="button_choose_dir_string">Choose directory</string>
-    <string name="button_random_background_string">Set random background</string>
+    <string name="button_random_wallpaper_string">Set random wallpaper</string>
     <string name="textview_current_wallpaper_string">Last set wallpaper name:\n%s</string>
     
     
