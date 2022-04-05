@@ -31,9 +31,7 @@ public class HomeFragment extends Fragment {
     private TextView textViewCurrentWallpaper;
     private ActivityResultLauncher<Uri> uriActivityResultLauncher;
 
-    SharedPreferences sharedPreferences;
-    private final String PREFERENCEKEY_WALLPAPER_DIR = "PREFERENCEKEY_WALLPAPER_DIR";
-    private final String PREFERENCEKEY_LAST_WALLPAPER_NAME = "PREFERENCEKEY_LAST_WALLPAPER_NAME";
+    private SharedPreferences sharedPreferences;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -46,7 +44,7 @@ public class HomeFragment extends Fragment {
 
             // Save globally and in preferences
             getMyApplication(requireContext()).wallpaperDir = result;
-            sharedPreferences.edit().putString(PREFERENCEKEY_WALLPAPER_DIR, result.toString()).apply();
+            sharedPreferences.edit().putString(getString(R.string.key_wallpaper_dir), result.toString()).apply();
 
             // Enable button
             buttonSetRandomWallpaper.setEnabled(true);
@@ -86,13 +84,14 @@ public class HomeFragment extends Fragment {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity());
         // Load Uri
-        if (sharedPreferences.contains(PREFERENCEKEY_WALLPAPER_DIR)) {
-            getMyApplication(requireContext()).wallpaperDir = Uri.parse(sharedPreferences.getString(PREFERENCEKEY_WALLPAPER_DIR, null));
+        if (sharedPreferences.contains(getString(R.string.key_wallpaper_dir))) {
+            getMyApplication(requireContext()).wallpaperDir = Uri.parse(sharedPreferences.getString(getString(R.string.key_wallpaper_dir), null));
             buttonSetRandomWallpaper.setEnabled(true);
         }
         // Load last set wallpaper name
-        if (sharedPreferences.contains(PREFERENCEKEY_LAST_WALLPAPER_NAME)) {
-            textViewCurrentWallpaper.setText(String.format(getString(R.string.textview_current_wallpaper_string), sharedPreferences.getString(PREFERENCEKEY_LAST_WALLPAPER_NAME, "-")));
+        if (sharedPreferences.contains(getString(R.string.key_current_picture))) {
+            textViewCurrentWallpaper.setText(String.format(getString(R.string.textview_current_wallpaper_string),
+                    sharedPreferences.getString(getString(R.string.key_current_picture), "-")));
         }
     }
 
@@ -106,7 +105,11 @@ public class HomeFragment extends Fragment {
             if (file != null) {
                 String fileName = file.getName();
                 textViewCurrentWallpaper.setText(String.format(getString(R.string.textview_current_wallpaper_string), fileName));
-                sharedPreferences.edit().putString(PREFERENCEKEY_LAST_WALLPAPER_NAME, fileName).apply();
+                int amountChangesManual = sharedPreferences.getInt(getString(R.string.key_amount_changes_manual), 0);
+                sharedPreferences.edit().
+                        putString(getString(R.string.key_current_picture), fileName).
+                        putInt(getString(R.string.key_amount_changes_manual), ++amountChangesManual).
+                        apply();
             }
         });
 

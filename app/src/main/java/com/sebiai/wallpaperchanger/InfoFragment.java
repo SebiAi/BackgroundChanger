@@ -1,64 +1,121 @@
 package com.sebiai.wallpaperchanger;
 
+import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
+
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
+import androidx.annotation.Nullable;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link InfoFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class InfoFragment extends Fragment {
+public class InfoFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private SharedPreferences sharedPreferences;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private Preference preferenceCurrentPictureName;
+    private Preference preferenceAmountPictures;
+    private Preference preferenceAmountChanges;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public InfoFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment InfoFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static InfoFragment newInstance(String param1, String param2) {
-        InfoFragment fragment = new InfoFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setPreferencesFromResource(R.xml.info_preferences, rootKey);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+
+        setup();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Register Listeners
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    private void setup() {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity());
+
+        preferenceCurrentPictureName = findPreference(getString(R.string.key_current_picture));
+        if (preferenceCurrentPictureName != null) {
+            preferenceCurrentPictureName.setOnPreferenceClickListener(this::onPreferenceClick);
+        }
+
+        preferenceAmountPictures = findPreference(getString(R.string.key_amount_picture));
+        if (preferenceAmountPictures != null) {
+            preferenceAmountPictures.setOnPreferenceClickListener(this::onPreferenceClick);
+        }
+        int amountPictures = MyFileHandler.getFiles(requireContext(), getMyApplication(requireContext()).wallpaperDir).size();
+        sharedPreferences.edit().putInt(getString(R.string.key_amount_picture), amountPictures).apply();
+
+        preferenceAmountChanges = findPreference(getString(R.string.key_amount_changes));
+        if (preferenceAmountChanges != null) {
+            preferenceAmountChanges.setOnPreferenceClickListener(this::onPreferenceClick);
+        }
+        updatePreferenceValues();
+    }
+
+    private void updatePreferenceValues() {
+        if (preferenceCurrentPictureName != null) {
+            preferenceCurrentPictureName.setTitle(String.format(getString(R.string.preference_current_picture_string),
+                    sharedPreferences.getString(preferenceCurrentPictureName.getKey(), "-")));
+        }
+
+        if (preferenceAmountPictures != null) {
+            preferenceAmountPictures.setTitle(String.format(getString(R.string.preference_amount_picture_string),
+                    sharedPreferences.getInt(preferenceAmountPictures.getKey(), 0)));
+        }
+
+        if (preferenceAmountChanges != null) {
+            int amountChangesAutomatic = sharedPreferences.getInt(getString(R.string.key_amount_changes_automatic), 0);
+            int amountChangesManual = sharedPreferences.getInt(getString(R.string.key_amount_changes_manual), 0);
+            int amountChanges = amountChangesAutomatic + amountChangesManual;
+
+            preferenceAmountChanges.setTitle(String.format(getString(R.string.preference_amount_changes_string), amountChanges));
+            preferenceAmountChanges.setSummary(String.format(getString(R.string.preference_amount_changes_summary_string),
+                    amountChangesAutomatic,
+                    amountChangesManual));
         }
     }
 
+    private boolean onPreferenceClick(Preference preference) {
+        switch (preference.getKey()) {
+            case "currentPictureName":
+                // TODO: Implement me
+                Toast.makeText(preference.getContext(), "Not implemented yet", Toast.LENGTH_SHORT).show();
+                return true;
+            case "amountPictures":
+                // TODO: Implement me
+                Toast.makeText(preference.getContext(), "Not implemented yet", Toast.LENGTH_SHORT).show();
+                return true;
+            case "amountChanges":
+                // TODO: Ask with a dialog before resetting
+                sharedPreferences.edit().
+                        putInt(getString(R.string.key_amount_changes), 0).
+                        putInt(getString(R.string.key_amount_changes_automatic), 0).
+                        putInt(getString(R.string.key_amount_changes_manual), 0).
+                        apply();
+                return true;
+        }
+        return false;
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_info, container, false);
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        // TODO: [Optional] Could be optimized to only refresh the shared preference that actually changed
+        updatePreferenceValues();
     }
 }

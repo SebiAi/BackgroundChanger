@@ -1,0 +1,26 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/preference_category_info_string">
+
+        <Preference
+            app:key="@string/key_current_picture"
+            app:title="@string/preference_current_picture_string"
+            app:summary="@string/preference_current_picture_summary_string" />
+
+        <Preference
+            app:key="@string/key_amount_picture"
+            app:title="@string/preference_amount_picture_string"
+            app:summary="@string/preference_amount_picture_summary_string" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/preference_category_statistic_string">
+
+        <Preference
+            app:key="@string/key_amount_changes"
+            app:title="@string/preference_amount_changes_string"
+            app:summary="@string/preference_amount_changes_summary_string" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

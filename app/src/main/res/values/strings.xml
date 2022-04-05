@@ -1,6 +1,7 @@
 <resources>
     <!-- Global -->
     <string name="app_name">Wallpaper Changer</string>
+    <string name="key_wallpaper_dir">wallpaperDir</string>
 
     <!-- Bottom Navigation -->
     <string name="item_home_string">HOME</string>
@@ -11,7 +12,23 @@
     <string name="button_choose_dir_string">Choose directory</string>
     <string name="button_random_wallpaper_string">Set random wallpaper</string>
     <string name="textview_current_wallpaper_string">Last set wallpaper name:\n%s</string>
-    
+
+    <!-- Info -->
+    <string name="preference_category_info_string">Info</string>
+    <string name="key_current_picture">currentPictureName</string>
+    <string name="preference_current_picture_string">Current picture: %s</string>
+    <string name="preference_current_picture_summary_string">Click to display</string>
+    <string name="key_amount_picture">amountPictures</string>
+    <string name="preference_amount_picture_string">Number of Pictures: %d</string>
+    <string name="preference_amount_picture_summary_string">Click to display all</string>
+    <string name="preference_category_statistic_string">Statistic</string>
+    <string name="key_amount_changes">amountChanges</string>
+    <string name="key_amount_changes_automatic">amountChangesAutomatic</string>
+    <string name="key_amount_changes_manual">amountChangesManual</string>
+    <string name="preference_amount_changes_string">Number of changes: %d</string>
+    <string name="preference_amount_changes_summary_string">Automatic: %d\nManual: %d\nClick to reset</string>
+
+
     
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
