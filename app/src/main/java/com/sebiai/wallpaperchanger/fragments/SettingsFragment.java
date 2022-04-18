@@ -1,8 +1,10 @@
-package com.sebiai.wallpaperchanger;
+package com.sebiai.wallpaperchanger.fragments;
 
 import android.os.Bundle;
 
 import androidx.preference.PreferenceFragmentCompat;
+
+import com.sebiai.wallpaperchanger.R;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 

@@ -8,7 +8,7 @@
             app:summary="@string/preference_current_picture_summary_string" />
 
         <Preference
-            app:key="@string/key_amount_picture"
+            app:key="@string/key_amount_pictures"
             app:title="@string/preference_amount_picture_string"
             app:summary="@string/preference_amount_picture_summary_string" />
 

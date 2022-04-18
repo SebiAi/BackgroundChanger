@@ -2,6 +2,7 @@
     <!-- Global -->
     <string name="app_name">Wallpaper Changer</string>
     <string name="key_wallpaper_dir">wallpaperDir</string>
+    <string name="worker_tag_auto_wallpaper_changer">autoWallpaperChanger</string>
 
     <!-- Bottom Navigation -->
     <string name="item_home_string">HOME</string>
@@ -12,13 +13,14 @@
     <string name="button_choose_dir_string">Choose directory</string>
     <string name="button_random_wallpaper_string">Set random wallpaper</string>
     <string name="textview_current_wallpaper_string">Last set wallpaper name:\n%s</string>
+    <string name="key_auto_change_enabled">autoEnabled</string>
 
     <!-- Info -->
     <string name="preference_category_info_string">Info</string>
     <string name="key_current_picture">currentPicture</string>
     <string name="preference_current_picture_string">Current picture: %s</string>
     <string name="preference_current_picture_summary_string">Click to display</string>
-    <string name="key_amount_picture">amountPictures</string>
+    <string name="key_amount_pictures">amountPictures</string>
     <string name="preference_amount_picture_string">Number of Pictures: %d</string>
     <string name="preference_amount_picture_summary_string">Click to display all</string>
     <string name="preference_category_statistic_string">Statistic</string>

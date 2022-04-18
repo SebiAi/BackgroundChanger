@@ -4,12 +4,14 @@ import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
 
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 
 import androidx.documentfile.provider.DocumentFile;
+import androidx.preference.PreferenceManager;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -60,9 +62,14 @@ public class MyFileHandler {
         return null;
     }
 
-    public static DocumentFile setRandomFileAsWallpaper(Context context) {
+    public static DocumentFile setRandomFileAsWallpaper(Context context, Uri wallpaperUri) {
+        // Save picture amount
+        ArrayList<Uri> uris = getFiles(context, wallpaperUri);
+        PreferenceManager.getDefaultSharedPreferences(context).edit().
+                putInt(context.getString(R.string.key_amount_pictures), uris.size()).
+                apply();
         // Get random
-        DocumentFile file = getRandomFile(context, getFiles(context, getMyApplication(context).wallpaperDir));
+        DocumentFile file = getRandomFile(context, uris);
 
         if (file != null) {
             // Set as Wallpaper
