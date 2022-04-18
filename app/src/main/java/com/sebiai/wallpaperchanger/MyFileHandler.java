@@ -5,11 +5,13 @@ import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 
 import androidx.documentfile.provider.DocumentFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -85,5 +87,37 @@ public class MyFileHandler {
             return false;
         ArrayList<Uri> uris = getFiles(context, getMyApplication(context).wallpaperDir);
         return uris.size() != 0;
+    }
+
+    public static Drawable getDrawableFromWallpaperUri(Context context, Uri uri) {
+        Drawable drawable = null;
+
+        DocumentFile file = DocumentFile.fromSingleUri(context, uri);
+        if (file != null) {
+            InputStream stream;
+            try {
+                stream = context.getContentResolver().openInputStream(uri);
+                drawable = Drawable.createFromStream(stream, file.getUri().getPath());
+                stream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return drawable;
+    }
+
+    public static String getNameFromWallpaperUri(Context context, Uri uri) {
+        String fileName = "-";
+
+        if (uri != null) {
+            // Get file
+            DocumentFile file = DocumentFile.fromSingleUri(context, uri);
+            // Get file name
+            if (file != null)
+                fileName = file.getName();
+        }
+
+        return fileName;
     }
 }

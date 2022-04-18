@@ -4,6 +4,7 @@ import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -19,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 /**
@@ -30,6 +32,7 @@ public class HomeFragment extends Fragment {
     private Button buttonSetRandomWallpaper;
     private TextView textViewCurrentWallpaper;
     private ActivityResultLauncher<Uri> uriActivityResultLauncher;
+    private FrameLayout frameLayout;
 
     private SharedPreferences sharedPreferences;
 
@@ -48,25 +51,6 @@ public class HomeFragment extends Fragment {
 
             // Enable button
             buttonSetRandomWallpaper.setEnabled(true);
-
-//                final ArrayList<Uri> uris = MyFileHandler.getFiles(requireContext(), result);
-//
-//                DocumentFile file = MyFileHandler.getRandomFile(requireContext(), uris);
-//                if (file != null) {
-//                    // Log
-//                    Log.d("Result", file.getName() + "\t" + file.getUri().getPath());
-//                    // Set as Wallpaper
-//                    try {
-//                        InputStream stream = requireContext().getContentResolver().openInputStream(file.getUri());
-//                        Drawable drawable = Drawable.createFromStream(stream, file.getUri().getPath());
-//                        stream.close();
-//                        frameLayout.setBackground(drawable);
-//
-//                        MyFileHandler.setFileAsWallpaper(requireContext(), file);
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
         });
     }
 
@@ -90,8 +74,20 @@ public class HomeFragment extends Fragment {
         }
         // Load last set wallpaper name
         if (sharedPreferences.contains(getString(R.string.key_current_picture))) {
-            textViewCurrentWallpaper.setText(String.format(getString(R.string.textview_current_wallpaper_string),
-                    sharedPreferences.getString(getString(R.string.key_current_picture), "-")));
+            Uri lastWallpaperUri = Uri.parse(sharedPreferences.getString(getString(R.string.key_current_picture), null));
+            // Check file name cache
+            if (getMyApplication(requireContext()).wallpaperFileName == null) {
+                // Set from uri
+                getMyApplication(requireContext()).wallpaperFileName = MyFileHandler.getNameFromWallpaperUri(requireContext(), lastWallpaperUri);
+            }
+            setCurrentWallpaperName(getMyApplication(requireContext()).wallpaperFileName);
+
+            // Check last wallpaper drawable cache
+            if (getMyApplication(requireContext()).wallpaperDrawableCache == null) {
+                // Set from uri
+                getMyApplication(requireContext()).wallpaperDrawableCache = MyFileHandler.getDrawableFromWallpaperUri(requireContext(), lastWallpaperUri);
+            }
+            frameLayout.setBackground(getMyApplication(requireContext()).wallpaperDrawableCache);
         }
     }
 
@@ -101,20 +97,30 @@ public class HomeFragment extends Fragment {
 
         buttonSetRandomWallpaper = requireView().findViewById(R.id.button_set_random_wallpaper);
         buttonSetRandomWallpaper.setOnClickListener(v -> {
+            // Set file as wallpaper
             DocumentFile file = MyFileHandler.setRandomFileAsWallpaper(requireContext());
             if (file != null) {
                 String fileName = file.getName();
-                textViewCurrentWallpaper.setText(String.format(getString(R.string.textview_current_wallpaper_string), fileName));
+                // Display file name
+                setCurrentWallpaperName(fileName);
+                // Save preferences
                 int amountChangesManual = sharedPreferences.getInt(getString(R.string.key_amount_changes_manual), 0);
                 sharedPreferences.edit().
-                        putString(getString(R.string.key_current_picture), fileName).
+                        putString(getString(R.string.key_current_picture), file.getUri().toString()).
                         putInt(getString(R.string.key_amount_changes_manual), ++amountChangesManual).
                         apply();
+                // Save cache
+                getMyApplication(requireContext()).wallpaperDrawableCache = MyFileHandler.getDrawableFromWallpaperUri(requireContext(), file.getUri());
+                getMyApplication(requireContext()).wallpaperFileName = fileName;
+                // Set wallpaper as fragment background
+                frameLayout.setBackground(getMyApplication(requireContext()).wallpaperDrawableCache);
             }
         });
 
         textViewCurrentWallpaper = requireView().findViewById(R.id.textview_current_wallpaper);
-        textViewCurrentWallpaper.setText(String.format(getString(R.string.textview_current_wallpaper_string), "-"));
+        setCurrentWallpaperName("-");
+
+        frameLayout = requireView().findViewById(R.id.frame_layout_home_fragment);
     }
 
     @Override
@@ -125,5 +131,9 @@ public class HomeFragment extends Fragment {
         if (!MyFileHandler.isWallpaperDirValid(requireContext())) {
             buttonSetRandomWallpaper.setEnabled(false);
         }
+    }
+
+    private void setCurrentWallpaperName(String fileName) {
+        textViewCurrentWallpaper.setText(String.format(getString(R.string.textview_current_wallpaper_string), fileName));
     }
 }

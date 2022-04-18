@@ -3,6 +3,7 @@ package com.sebiai.wallpaperchanger;
 import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
 
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -71,7 +72,7 @@ public class InfoFragment extends PreferenceFragmentCompat implements SharedPref
     private void updatePreferenceValues() {
         if (preferenceCurrentPictureName != null) {
             preferenceCurrentPictureName.setTitle(String.format(getString(R.string.preference_current_picture_string),
-                    sharedPreferences.getString(preferenceCurrentPictureName.getKey(), "-")));
+                    getMyApplication(requireContext()).wallpaperFileName));
         }
 
         if (preferenceAmountPictures != null) {

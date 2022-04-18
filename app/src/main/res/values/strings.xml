@@ -15,7 +15,7 @@
 
     <!-- Info -->
     <string name="preference_category_info_string">Info</string>
-    <string name="key_current_picture">currentPictureName</string>
+    <string name="key_current_picture">currentPicture</string>
     <string name="preference_current_picture_string">Current picture: %s</string>
     <string name="preference_current_picture_summary_string">Click to display</string>
     <string name="key_amount_picture">amountPictures</string>
