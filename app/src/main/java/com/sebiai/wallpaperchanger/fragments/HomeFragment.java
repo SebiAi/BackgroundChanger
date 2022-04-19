@@ -87,7 +87,12 @@ public class HomeFragment extends Fragment {
     }
 
     private void setFromCache() {
-        Uri lastWallpaperUri = Uri.parse(sharedPreferences.getString(getString(R.string.key_current_picture), null));
+        String stringUri = sharedPreferences.getString(getString(R.string.key_current_picture), null);
+
+        Uri lastWallpaperUri = null;
+        if (stringUri != null)
+            lastWallpaperUri = Uri.parse(stringUri);
+
         // Check file name cache
         if (getMyApplication(requireContext()).wallpaperFileName == null) {
             // Set from uri

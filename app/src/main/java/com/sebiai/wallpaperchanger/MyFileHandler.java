@@ -98,6 +98,8 @@ public class MyFileHandler {
 
     public static Drawable getDrawableFromWallpaperUri(Context context, Uri uri) {
         Drawable drawable = null;
+        if (uri == null)
+            return null;
 
         DocumentFile file = DocumentFile.fromSingleUri(context, uri);
         if (file != null) {
