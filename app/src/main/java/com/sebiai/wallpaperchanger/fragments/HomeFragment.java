@@ -2,13 +2,10 @@ package com.sebiai.wallpaperchanger.fragments;
 
 import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
