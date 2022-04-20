@@ -1,14 +1,14 @@
 package com.sebiai.wallpaperchanger;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -24,6 +24,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         setup();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Test for optimization // TODO: Implement this in setup process (https://stackoverflow.com/questions/39256501/check-if-battery-optimization-is-enabled-or-not-for-an-app)
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        boolean isIgnoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
+        Toast.makeText(getApplicationContext(), "Battery optimizations enabled: " + !isIgnoringBatteryOptimizations, Toast.LENGTH_LONG).show();
     }
 
     private void setup() {
