@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.view.LayoutInflater;
@@ -23,10 +24,13 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.sebiai.wallpaperchanger.MyFileHandler;
 import com.sebiai.wallpaperchanger.R;
 import com.sebiai.wallpaperchanger.worker.AutoWallpaperChangerWorker;
 
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -63,7 +67,30 @@ public class HomeFragment extends Fragment {
         }
 
         // Load auto wallpaper
-        switchAutoChange.setChecked(sharedPreferences.getBoolean(getString(R.string.key_auto_change_enabled), false));
+        boolean isChecked = sharedPreferences.getBoolean(getString(R.string.key_auto_change_enabled), false);
+        switchAutoChange.setChecked(isChecked);
+        // Check if not running
+        if (!isWorkScheduled(getString(R.string.worker_tag_auto_wallpaper_changer)) && isChecked) {
+            // Start again
+            startWorker();
+        }
+    }
+
+    private boolean isWorkScheduled(String tag) {
+        WorkManager instance = WorkManager.getInstance(requireContext());
+        ListenableFuture<List<WorkInfo>> statuses = instance.getWorkInfosByTag(tag);
+        try {
+            boolean running = false;
+            List<WorkInfo> workInfoList = statuses.get();
+            for (WorkInfo workInfo : workInfoList) {
+                WorkInfo.State state = workInfo.getState();
+                running = state == WorkInfo.State.RUNNING | state == WorkInfo.State.ENQUEUED;
+            }
+            return running;
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private void setFromCache() {
@@ -148,23 +175,26 @@ public class HomeFragment extends Fragment {
                     putBoolean(getString(R.string.key_auto_change_enabled), isEnabled).
                     apply();
             if (isEnabled) {
-                // TODO: Use AlarmManager instead, more reliable or test what happens if battery optimisation for this app is disabled
-                // Enable Work
-                PeriodicWorkRequest autoWallpaperChangerWorkRequest =
-                        new PeriodicWorkRequest.Builder(AutoWallpaperChangerWorker.class, 15, TimeUnit.MINUTES).
-                                setInitialDelay(5, TimeUnit.SECONDS).
-                                addTag(getString(R.string.worker_tag_auto_wallpaper_changer)).
-                                build();
-                WorkManager.getInstance(requireContext()).
-                        enqueueUniquePeriodicWork(
-                                getString(R.string.worker_tag_auto_wallpaper_changer),
-                                ExistingPeriodicWorkPolicy.KEEP,
-                                autoWallpaperChangerWorkRequest);
+                // Start Work
+                startWorker();
             } else {
-                // Disable Work
+                // Stop Work
                 WorkManager.getInstance(requireContext()).cancelUniqueWork(getString(R.string.worker_tag_auto_wallpaper_changer));
             }
         });
+    }
+
+    private void startWorker() {
+        PeriodicWorkRequest autoWallpaperChangerWorkRequest =
+                new PeriodicWorkRequest.Builder(AutoWallpaperChangerWorker.class, 15, TimeUnit.MINUTES).
+                        setInitialDelay(5, TimeUnit.SECONDS).
+                        addTag(getString(R.string.worker_tag_auto_wallpaper_changer)).
+                        build();
+        WorkManager.getInstance(requireContext()).
+                enqueueUniquePeriodicWork(
+                        getString(R.string.worker_tag_auto_wallpaper_changer),
+                        ExistingPeriodicWorkPolicy.KEEP,
+                        autoWallpaperChangerWorkRequest);
     }
 
     private void setCurrentWallpaperName(String fileName) {
