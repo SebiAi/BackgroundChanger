@@ -26,16 +26,7 @@
             android:text="@string/textview_current_wallpaper_string"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/button_choose_dir" />
-
-        <Button
-            android:id="@+id/button_choose_dir"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_choose_dir_string"
-            app:layout_constraintBottom_toTopOf="@+id/button_set_random_wallpaper"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintBottom_toTopOf="@+id/button_set_random_wallpaper" />
 
         <Button
             android:id="@+id/button_set_random_wallpaper"

@@ -36,11 +36,8 @@ import java.util.concurrent.TimeUnit;
  * A simple {@link Fragment} subclass.
  */
 public class HomeFragment extends Fragment {
-
-    private Button buttonChooseDir;
     private Button buttonSetRandomWallpaper;
     private TextView textViewCurrentWallpaper;
-    private final ActivityResultLauncher<Uri> uriActivityResultLauncher;
     private FrameLayout frameLayout;
     private SwitchCompat switchAutoChange;
 
@@ -48,20 +45,6 @@ public class HomeFragment extends Fragment {
 
     public HomeFragment() {
         // Required empty public constructor
-        uriActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.OpenDocumentTree(), result -> {
-            if (result == null)
-                return;
-
-            // Make persistent
-            requireActivity().getContentResolver().takePersistableUriPermission(result, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-            // Save globally and in preferences
-            getMyApplication(requireContext()).wallpaperDir = result;
-            sharedPreferences.edit().putString(getString(R.string.key_wallpaper_dir), result.toString()).apply();
-
-            // Enable button
-            buttonSetRandomWallpaper.setEnabled(true);
-        });
     }
 
     @Override
@@ -133,9 +116,6 @@ public class HomeFragment extends Fragment {
 
     private void setup() {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity());
-
-        buttonChooseDir = requireView().findViewById(R.id.button_choose_dir);
-        buttonChooseDir.setOnClickListener(v -> uriActivityResultLauncher.launch(Uri.parse("image/*")));
 
         buttonSetRandomWallpaper = requireView().findViewById(R.id.button_set_random_wallpaper);
         buttonSetRandomWallpaper.setOnClickListener(v -> {
