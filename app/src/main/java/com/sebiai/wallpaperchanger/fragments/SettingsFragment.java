@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -16,12 +15,13 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
 import com.sebiai.wallpaperchanger.R;
+import com.sebiai.wallpaperchanger.dialogs.ConfigureAutomaticModeDialogFragment;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class SettingsFragment extends PreferenceFragmentCompat {
+public class SettingsFragment extends PreferenceFragmentCompat implements ConfigureAutomaticModeDialogFragment.OnConfigureAutomaticModeDialogDismissListener {
     private ActivityResultLauncher<Uri> uriActivityResultLauncher;
     private SharedPreferences sharedPreferences;
 
@@ -113,11 +113,17 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 uriActivityResultLauncher.launch(Uri.parse("image/*"));
                 return true;
             case "intervalStartTime":
-                // TODO: Implement me
-                Toast.makeText(preference.getContext(), "Not implemented yet", Toast.LENGTH_SHORT).show();
+                // Start dialog
+                ConfigureAutomaticModeDialogFragment dialog = new ConfigureAutomaticModeDialogFragment();
+                dialog.show(getParentFragmentManager(), null);
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public void onConfigureAutomaticModeDialogDismissListener(Date intervalTime, Date startTime) {
+        // TODO: Implement onConfigureAutomaticModeDialogDismissListener
     }
 }
 

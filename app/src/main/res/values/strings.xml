@@ -6,6 +6,8 @@
     <string name="view_image_string">View using</string>
     <string name="yes_string">Yes</string>
     <string name="no_string">No</string>
+    <string name="ok_string">OK</string>
+    <string name="cancel_string">Cancel</string>
 
     <!-- Bottom Navigation -->
     <string name="item_home_string">HOME</string>
@@ -45,5 +47,9 @@
     <string name="key_interval_start_time">intervalStartTime</string>
     <string name="preference_interval_start_time_string">Change interval</string>
     <string name="preference_interval_start_time_summary_string">Changing every %s\nStarting at %s\nClick to change</string>
+    <string name="dialog_heading_start_time">Start time:</string>
+    <string name="dialog_heading_time_interval">Interval:</string>
+    <string name="dialog_hour_string">hrs</string>
+    <string name="dialog_minute_string">mins</string>
 
 </resources>
