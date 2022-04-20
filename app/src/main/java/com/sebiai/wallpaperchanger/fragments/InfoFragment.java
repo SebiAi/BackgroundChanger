@@ -2,6 +2,7 @@ package com.sebiai.wallpaperchanger.fragments;
 
 import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -130,9 +131,19 @@ public class InfoFragment extends PreferenceFragmentCompat {
 
     private boolean onPreferenceClick(Preference preference) {
         switch (preference.getKey()) {
-            case "currentPictureName":
-                // TODO: Implement me
-                Toast.makeText(preference.getContext(), "Not implemented yet", Toast.LENGTH_SHORT).show();
+            case "currentPicture":
+                String stringUri = sharedPreferences.getString(getString(R.string.key_current_picture), null);
+                Uri lastWallpaperUri = null;
+                if (stringUri != null)
+                    lastWallpaperUri = Uri.parse(stringUri);
+
+                if (lastWallpaperUri == null)
+                    return true;
+
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(lastWallpaperUri, "image/*");
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(Intent.createChooser(intent, getString(R.string.view_image_string)));
                 return true;
             case "amountPictures":
                 // TODO: Implement me

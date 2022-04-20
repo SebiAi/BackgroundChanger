@@ -64,7 +64,7 @@ public class AutoWallpaperChangerWorker extends Worker {
         SimpleDateFormat sdfsmall = new SimpleDateFormat("HH:mm:ss", Locale.GERMAN);
         Date currentDate = Calendar.getInstance(Locale.GERMAN).getTime();
         String logMessage = "Worker run at " + sdf.format(currentDate);
-        if (lastExecutionDate != null)
+        if (lastExecutionDate != null) // TODO: Remove or make it work
             logMessage += " | Delta: " + sdfsmall.format(currentDate.getTime() - lastExecutionDate.getTime());
         lastExecutionDate = currentDate;
 

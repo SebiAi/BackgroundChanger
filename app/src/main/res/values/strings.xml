@@ -3,6 +3,7 @@
     <string name="app_name">Wallpaper Changer</string>
     <string name="key_wallpaper_dir">wallpaperDir</string>
     <string name="worker_tag_auto_wallpaper_changer">autoWallpaperChanger</string>
+    <string name="view_image_string">View using</string>
 
     <!-- Bottom Navigation -->
     <string name="item_home_string">HOME</string>
