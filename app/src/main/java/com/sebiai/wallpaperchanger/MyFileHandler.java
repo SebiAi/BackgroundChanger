@@ -25,6 +25,9 @@ public class MyFileHandler {
     public static ArrayList<Uri> getFiles(Context context, Uri treePath) {
         final ArrayList<Uri> uris = new ArrayList<>();
 
+        if (treePath == null)
+            return uris;
+
         // Get all files as Cursor
         DocumentFile dir = DocumentFile.fromTreeUri(context, treePath);
         Uri dirUri = Objects.requireNonNull(dir).getUri();
