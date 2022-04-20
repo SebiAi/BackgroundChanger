@@ -4,6 +4,8 @@
     <string name="key_wallpaper_dir">wallpaperDir</string>
     <string name="worker_tag_auto_wallpaper_changer">autoWallpaperChanger</string>
     <string name="view_image_string">View using</string>
+    <string name="yes_string">Yes</string>
+    <string name="no_string">No</string>
 
     <!-- Bottom Navigation -->
     <string name="item_home_string">HOME</string>
@@ -30,6 +32,9 @@
     <string name="key_amount_changes_manual">amountChangesManual</string>
     <string name="preference_amount_changes_string">Number of changes: %d</string>
     <string name="preference_amount_changes_summary_string">Automatic: %d\nManual: %d\nClick to reset</string>
+    <string name="question_title_reset_amount_changes">Reset statistic</string>
+    <string name="question_message_reset_amount_changes">Do you really want to reset all the statistics?</string>
+    <string name="confirmation_reset_amount_changes">Statistics were reset</string>
 
     <!-- Settings -->
     <string name="preference_category_general_string">General</string>

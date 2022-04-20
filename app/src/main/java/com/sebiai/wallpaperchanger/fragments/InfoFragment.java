@@ -16,8 +16,9 @@ import android.widget.Toast;
 
 import com.sebiai.wallpaperchanger.MyFileHandler;
 import com.sebiai.wallpaperchanger.R;
+import com.sebiai.wallpaperchanger.dialogs.QuestionDialogFragment;
 
-public class InfoFragment extends PreferenceFragmentCompat {
+public class InfoFragment extends PreferenceFragmentCompat implements QuestionDialogFragment.OnQuestionDialogDismissListener {
     private SharedPreferences sharedPreferences;
 
     private Preference preferenceCurrentPictureName;
@@ -150,14 +151,27 @@ public class InfoFragment extends PreferenceFragmentCompat {
                 Toast.makeText(preference.getContext(), "Not implemented yet", Toast.LENGTH_SHORT).show();
                 return true;
             case "amountChanges":
-                // TODO: Ask with a dialog before resetting
-                sharedPreferences.edit().
-                        putInt(getString(R.string.key_amount_changes), 0).
-                        putInt(getString(R.string.key_amount_changes_automatic), 0).
-                        putInt(getString(R.string.key_amount_changes_manual), 0).
-                        apply();
+                QuestionDialogFragment dialog = new QuestionDialogFragment(getString(R.string.question_title_reset_amount_changes),
+                        getString(R.string.question_message_reset_amount_changes),
+                        getString(R.string.yes_string),
+                        getString(R.string.no_string));
+                dialog.show(getParentFragmentManager(), null);
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public void onQuestionDialogDismissListener(boolean isPositive) {
+        if (!isPositive)
+            return;
+
+        sharedPreferences.edit().
+                putInt(getString(R.string.key_amount_changes), 0).
+                putInt(getString(R.string.key_amount_changes_automatic), 0).
+                putInt(getString(R.string.key_amount_changes_manual), 0).
+                apply();
+
+        Toast.makeText(requireContext(), getString(R.string.confirmation_reset_amount_changes), Toast.LENGTH_SHORT).show();
     }
 }
