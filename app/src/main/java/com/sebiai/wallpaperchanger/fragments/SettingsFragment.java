@@ -17,6 +17,13 @@ import androidx.preference.PreferenceManager;
 import com.sebiai.wallpaperchanger.R;
 import com.sebiai.wallpaperchanger.dialogs.ConfigureAutomaticModeDialogFragment;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -122,8 +129,54 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Config
     }
 
     @Override
-    public void onConfigureAutomaticModeDialogDismissListener(Date intervalTime, Date startTime) {
+    public void onConfigureAutomaticModeDialogDismissListener(Calendar intervalTime, Calendar startTime) {
         // TODO: Implement onConfigureAutomaticModeDialogDismissListener
+        String intervalTimeString;
+        String startTimeString;
+
+        // Serialize to string
+        try {
+            intervalTimeString = toString(intervalTime);
+            startTimeString = toString(startTime);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Save in sharedPreferences
+        sharedPreferences.edit().
+                putString(getString(R.string.key_interval_time), intervalTimeString).
+                putString(getString(R.string.key_interval_start_time), startTimeString).
+                apply();
+
+        // Change summary of preference
+        String preferenceSummary = String.format(getString(R.string.preference_interval_start_time_summary_string),
+                intervalTime.get(Calendar.HOUR_OF_DAY), // TODO; Figure out how to extract more than just 0-23h
+                intervalTime.get(Calendar.MINUTE),
+                startTime.get(Calendar.HOUR_OF_DAY),
+                startTime.get(Calendar.MINUTE));
+
+        setPreferenceSummary(preferenceIntervalTime, preferenceSummary);
+    }
+
+    /** Write the object to a Base64 string. */
+    private static String toString( Serializable o ) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream( baos );
+        oos.writeObject( o );
+        oos.close();
+        return Base64.getEncoder().encodeToString(baos.toByteArray());
+    }
+
+    /** Read the object from Base64 string. */
+    private static Object fromString( String s ) throws IOException ,
+            ClassNotFoundException {
+        byte [] data = Base64.getDecoder().decode( s );
+        ObjectInputStream ois = new ObjectInputStream(
+                new ByteArrayInputStream(  data ) );
+        Object o  = ois.readObject();
+        ois.close();
+        return o;
     }
 }
 

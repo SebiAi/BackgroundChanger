@@ -46,7 +46,7 @@
     <string name="key_interval_time">intervalTime</string>
     <string name="key_interval_start_time">intervalStartTime</string>
     <string name="preference_interval_start_time_string">Change interval</string>
-    <string name="preference_interval_start_time_summary_string">Changing every %s\nStarting at %s\nClick to change</string>
+    <string name="preference_interval_start_time_summary_string">Changing every %dh %dm\nStarting at %02d:%02d o\'clock\nClick to change</string>
     <string name="dialog_heading_start_time">Start time:</string>
     <string name="dialog_heading_time_interval">Interval:</string>
     <string name="dialog_hour_string">hrs</string>

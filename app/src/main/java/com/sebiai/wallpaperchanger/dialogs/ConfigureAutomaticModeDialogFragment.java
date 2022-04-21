@@ -33,7 +33,7 @@ public class ConfigureAutomaticModeDialogFragment extends DialogFragment {
     boolean isPositive = false;
 
     public interface OnConfigureAutomaticModeDialogDismissListener {
-        void onConfigureAutomaticModeDialogDismissListener(Date intervalTime, Date startTime);
+        void onConfigureAutomaticModeDialogDismissListener(Calendar intervalTime, Calendar startTime);
     }
 
     public ConfigureAutomaticModeDialogFragment() {
@@ -105,25 +105,25 @@ public class ConfigureAutomaticModeDialogFragment extends DialogFragment {
     public void onDismiss(@NonNull DialogInterface dialog) {
         if (isPositive) {
             // Define variables
-            Date intervalTime;
-            Date startTime;
+            Calendar intervalTime;
+            Calendar startTime;
 
             // Get intervalTime
-            intervalTime = getDate(numberPickerIntervalHours.getValue(), numberPickerIntervalMinutes.getValue());
+            intervalTime = getCalendar(numberPickerIntervalHours.getValue(), numberPickerIntervalMinutes.getValue());
 
             // Get startTime
-            startTime = getDate(timePickerStartTime.getHour(), timePickerStartTime.getMinute());
+            startTime = getCalendar(timePickerStartTime.getHour(), timePickerStartTime.getMinute());
 
             mCallback.onConfigureAutomaticModeDialogDismissListener(intervalTime, startTime);
         }
         super.onDismiss(dialog);
     }
 
-    private Date getDate(int hours, int minutes) {
+    private Calendar getCalendar(int hours, int minutes) {
         Calendar c = Calendar.getInstance();
         c.clear();
         c.set(Calendar.HOUR, hours);
-        c.set(Calendar.MINUTE, minutes);
-        return c.getTime();
+        c.set(Calendar.MINUTE, minutes); // TODO; Figure out how to store more than just 0-23h
+        return c;
     }
 }
