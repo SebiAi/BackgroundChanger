@@ -18,9 +18,9 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.sebiai.wallpaperchanger.R;
+import com.sebiai.wallpaperchanger.objects.AutomaticIntervalContainer;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Objects;
 
 public class ConfigureAutomaticModeDialogFragment extends DialogFragment {
@@ -33,7 +33,7 @@ public class ConfigureAutomaticModeDialogFragment extends DialogFragment {
     boolean isPositive = false;
 
     public interface OnConfigureAutomaticModeDialogDismissListener {
-        void onConfigureAutomaticModeDialogDismissListener(Calendar intervalTime, Calendar startTime);
+        void onConfigureAutomaticModeDialogDismissListener(AutomaticIntervalContainer automaticIntervalContainer);
     }
 
     public ConfigureAutomaticModeDialogFragment() {
@@ -108,23 +108,18 @@ public class ConfigureAutomaticModeDialogFragment extends DialogFragment {
             // Define variables
             Calendar intervalTime;
             Calendar startTime;
+            AutomaticIntervalContainer automaticIntervalContainer = new AutomaticIntervalContainer();
 
             // Get intervalTime
-            intervalTime = getCalendar(numberPickerIntervalHours.getValue(), numberPickerIntervalMinutes.getValue());
+            automaticIntervalContainer.intervalTimeHours = numberPickerIntervalHours.getValue();
+            automaticIntervalContainer.intervalTimeMinutes = numberPickerIntervalMinutes.getValue();
 
             // Get startTime
-            startTime = getCalendar(timePickerStartTime.getHour(), timePickerStartTime.getMinute());
+            automaticIntervalContainer.intervalStartHours = timePickerStartTime.getHour();
+            automaticIntervalContainer.intervalStartMinutes = timePickerStartTime.getMinute();
 
-            mCallback.onConfigureAutomaticModeDialogDismissListener(intervalTime, startTime);
+            mCallback.onConfigureAutomaticModeDialogDismissListener(automaticIntervalContainer);
         }
         super.onDismiss(dialog);
-    }
-
-    private Calendar getCalendar(int hours, int minutes) {
-        Calendar c = Calendar.getInstance();
-        c.clear();
-        c.set(Calendar.HOUR, hours);
-        c.set(Calendar.MINUTE, minutes); // TODO; Figure out how to store more than just 0-23h
-        return c;
     }
 }

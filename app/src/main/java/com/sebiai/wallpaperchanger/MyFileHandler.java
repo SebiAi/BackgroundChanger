@@ -13,7 +13,6 @@ import android.provider.DocumentsContract;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.PreferenceManager;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -33,11 +32,17 @@ public class MyFileHandler {
         Uri dirUri = Objects.requireNonNull(dir).getUri();
         final Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(dirUri,
                 DocumentsContract.getDocumentId(dirUri));
-        final Cursor c = context.getContentResolver().query(childrenUri, new String[] {
-                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-                DocumentsContract.Document.COLUMN_MIME_TYPE
-        }, null, null, null);
+        Cursor c = null;
+
+        try {
+            c = context.getContentResolver().query(childrenUri, new String[] {
+                    DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                    DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                    DocumentsContract.Document.COLUMN_MIME_TYPE
+            }, null, null, null);
+        } catch (SecurityException ignored) {
+
+        }
 
         if (c == null)
             return uris;
@@ -93,9 +98,9 @@ public class MyFileHandler {
     }
 
     public static boolean isWallpaperDirValid(Context context) {
-        if (getMyApplication(context).wallpaperDir == null)
+        if (MyFileHandler.getWallpaperDirUri(context) == null)
             return false;
-        ArrayList<Uri> uris = getFiles(context, getMyApplication(context).wallpaperDir);
+        ArrayList<Uri> uris = getFiles(context, MyFileHandler.getWallpaperDirUri(context));
         return uris.size() != 0;
     }
 
@@ -113,6 +118,8 @@ public class MyFileHandler {
                 stream.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (SecurityException ignored) {
+
             }
         }
 
@@ -131,5 +138,25 @@ public class MyFileHandler {
         }
 
         return fileName;
+    }
+
+    public static Uri getWallpaperDirUri(Context context) {
+        return getUriFromPreference(context, context.getString(R.string.key_wallpaper_dir));
+    }
+
+    public static Uri getCurrentWallpaperUri(Context context) {
+        return getUriFromPreference(context, context.getString(R.string.key_current_picture));
+    }
+
+    private static Uri getUriFromPreference(Context context, String preferenceKey) {
+        Uri uri = null;
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String uriString = sharedPreferences.getString(preferenceKey, null);
+
+        if (uriString != null)
+            uri = Uri.parse(uriString);
+
+        return uri;
     }
 }

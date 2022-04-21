@@ -1,21 +1,24 @@
 package com.sebiai.wallpaperchanger.fragments;
 
-import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
-
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.UriPermission;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import com.sebiai.wallpaperchanger.MyFileHandler;
 import com.sebiai.wallpaperchanger.R;
 import com.sebiai.wallpaperchanger.dialogs.ConfigureAutomaticModeDialogFragment;
+import com.sebiai.wallpaperchanger.objects.AutomaticIntervalContainer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,13 +27,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Base64;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.List;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements ConfigureAutomaticModeDialogFragment.OnConfigureAutomaticModeDialogDismissListener {
     private ActivityResultLauncher<Uri> uriActivityResultLauncher;
     private SharedPreferences sharedPreferences;
+
+    private SwitchCompat switchAutoChange;
 
     private Preference preferenceWallpaperDir;
     private Preference preferenceIntervalTime;
@@ -51,20 +54,24 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Config
                 return;
 
             // Make old not persistent any more
-            if (getMyApplication(requireContext()).wallpaperDir != null)
-                requireActivity().getContentResolver().releasePersistableUriPermission(getMyApplication(requireContext()).wallpaperDir,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            ContentResolver cs = requireActivity().getContentResolver();
+            List<UriPermission> persistedUriPermissions = cs.getPersistedUriPermissions();
+            for (UriPermission persistedUriPermission : persistedUriPermissions) {
+                cs.releasePersistableUriPermission(persistedUriPermission.getUri(), Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
 
             // Make persistent
             requireActivity().getContentResolver().takePersistableUriPermission(result, Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-            // Save globally and in preferences
-            getMyApplication(requireContext()).wallpaperDir = result;
+            // Save preference
             sharedPreferences.edit().putString(getString(R.string.key_wallpaper_dir), result.toString()).apply();
 
             // Refresh preference
             setPreferenceSummary(preferenceWallpaperDir, String.format(getString(R.string.preference_wallpaper_dir_summary_string),
                     FileUtil.getFullPathFromTreeUri(result, requireContext())));
+
+            // Enable toggle switch
+            switchAutoChange.setEnabled(true);
         });
     }
 
@@ -72,10 +79,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Config
     public void onResume() {
         super.onResume();
 
-        Calendar calendar = Calendar.getInstance(Locale.GERMAN);
-        calendar.set(1900, 0, 1, 12, 12, 0);
-
-        Date date = calendar.getTime();
+        updatePreferenceValues();
     }
 
     private void setup() {
@@ -86,11 +90,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Config
             preferenceWallpaperDir.setOnPreferenceClickListener(this::onPreferenceClick);
         }
 
-        preferenceIntervalTime = findPreference(getString(R.string.key_interval_start_time));
+        preferenceIntervalTime = findPreference(getString(R.string.key_automatic_interval));
         if (preferenceIntervalTime != null) {
             preferenceIntervalTime.setOnPreferenceClickListener(this::onPreferenceClick);
         }
-        updatePreferenceValues();
+
+        switchAutoChange = requireActivity().findViewById(R.id.switch_enable_auto_change);
     }
 
     private void setPreferenceSummary(Preference preference, String summary) {
@@ -101,17 +106,33 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Config
     private void updatePreferenceValues() {
         // Current Wallpaper Dir
         String wallpaperDir = "-";
-        String stringUri = sharedPreferences.getString(getString(R.string.key_wallpaper_dir), null);
 
-        Uri wallpaperDirUri = null;
-        if (stringUri != null)
-            wallpaperDirUri = Uri.parse(stringUri);
-
+        Uri wallpaperDirUri = MyFileHandler.getWallpaperDirUri(requireContext());
         if (wallpaperDirUri != null)
             wallpaperDir = FileUtil.getFullPathFromTreeUri(wallpaperDirUri, requireContext());
 
         setPreferenceSummary(preferenceWallpaperDir, String.format(getString(R.string.preference_wallpaper_dir_summary_string),
                 wallpaperDir));
+
+        // Automatic Interval
+        AutomaticIntervalContainer automaticIntervalContainer = new AutomaticIntervalContainer();
+        String automaticIntervalContainerString = sharedPreferences.getString(getString(R.string.key_automatic_interval), null);
+
+        if (automaticIntervalContainerString != null) {
+            // Deserialize
+            try {
+                automaticIntervalContainer = (AutomaticIntervalContainer) fromString(automaticIntervalContainerString);
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        String preferenceSummary = String.format(getString(R.string.preference_interval_start_time_summary_string),
+                automaticIntervalContainer.intervalTimeHours,
+                automaticIntervalContainer.intervalTimeMinutes,
+                automaticIntervalContainer.intervalStartHours,
+                automaticIntervalContainer.intervalStartMinutes);
+        setPreferenceSummary(preferenceIntervalTime, preferenceSummary);
     }
 
     private boolean onPreferenceClick(Preference preference) {
@@ -119,7 +140,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Config
             case "wallpaperDir":
                 uriActivityResultLauncher.launch(Uri.parse("image/*"));
                 return true;
-            case "intervalStartTime":
+            case "automaticInterval":
                 // Start dialog
                 ConfigureAutomaticModeDialogFragment dialog = new ConfigureAutomaticModeDialogFragment();
                 dialog.show(getParentFragmentManager(), null);
@@ -129,15 +150,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Config
     }
 
     @Override
-    public void onConfigureAutomaticModeDialogDismissListener(Calendar intervalTime, Calendar startTime) {
-        // TODO: Implement onConfigureAutomaticModeDialogDismissListener
-        String intervalTimeString;
-        String startTimeString;
+    public void onConfigureAutomaticModeDialogDismissListener(AutomaticIntervalContainer automaticIntervalContainer) {
+        // Initialize variables
+        String automaticIntervalContainerString;
 
         // Serialize to string
         try {
-            intervalTimeString = toString(intervalTime);
-            startTimeString = toString(startTime);
+            automaticIntervalContainerString = toString(automaticIntervalContainer);
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -145,16 +164,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Config
 
         // Save in sharedPreferences
         sharedPreferences.edit().
-                putString(getString(R.string.key_interval_time), intervalTimeString).
-                putString(getString(R.string.key_interval_start_time), startTimeString).
+                putString(getString(R.string.key_automatic_interval), automaticIntervalContainerString).
                 apply();
 
         // Change summary of preference
         String preferenceSummary = String.format(getString(R.string.preference_interval_start_time_summary_string),
-                intervalTime.get(Calendar.HOUR_OF_DAY), // TODO; Figure out how to extract more than just 0-23h
-                intervalTime.get(Calendar.MINUTE),
-                startTime.get(Calendar.HOUR_OF_DAY),
-                startTime.get(Calendar.MINUTE));
+                automaticIntervalContainer.intervalTimeHours,
+                automaticIntervalContainer.intervalTimeMinutes,
+                automaticIntervalContainer.intervalStartHours,
+                automaticIntervalContainer.intervalStartMinutes);
 
         setPreferenceSummary(preferenceIntervalTime, preferenceSummary);
     }

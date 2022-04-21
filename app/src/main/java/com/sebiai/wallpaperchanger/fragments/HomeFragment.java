@@ -8,14 +8,9 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,14 +19,8 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.sebiai.wallpaperchanger.MyFileHandler;
 import com.sebiai.wallpaperchanger.R;
-import com.sebiai.wallpaperchanger.worker.AutoWallpaperChangerWorker;
-
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,7 +29,6 @@ public class HomeFragment extends Fragment {
     private Button buttonSetRandomWallpaper;
     private TextView textViewCurrentWallpaper;
     private FrameLayout frameLayout;
-    private SwitchCompat switchAutoChange;
 
     private SharedPreferences sharedPreferences;
 
@@ -59,58 +47,23 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setup();
-
-        // Load Uri
-        if (sharedPreferences.contains(getString(R.string.key_wallpaper_dir))) {
-            getMyApplication(requireContext()).wallpaperDir = Uri.parse(sharedPreferences.getString(getString(R.string.key_wallpaper_dir), null));
-            buttonSetRandomWallpaper.setEnabled(true);
-        }
-
-        // Load auto wallpaper
-        boolean isChecked = sharedPreferences.getBoolean(getString(R.string.key_auto_change_enabled), false);
-        switchAutoChange.setChecked(isChecked);
-        // Check if not running
-        if (!isWorkScheduled(getString(R.string.worker_tag_auto_wallpaper_changer)) && isChecked) {
-            // Start again
-            startWorker();
-        }
     }
 
-    private boolean isWorkScheduled(String tag) {
-        WorkManager instance = WorkManager.getInstance(requireContext());
-        ListenableFuture<List<WorkInfo>> statuses = instance.getWorkInfosByTag(tag);
-        try {
-            boolean running = false;
-            List<WorkInfo> workInfoList = statuses.get();
-            for (WorkInfo workInfo : workInfoList) {
-                WorkInfo.State state = workInfo.getState();
-                running = state == WorkInfo.State.RUNNING | state == WorkInfo.State.ENQUEUED;
-            }
-            return running;
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private void setFromCache() {
-        String stringUri = sharedPreferences.getString(getString(R.string.key_current_picture), null);
-
-        Uri lastWallpaperUri = null;
-        if (stringUri != null)
-            lastWallpaperUri = Uri.parse(stringUri);
+    private void updatePreferenceValues() {
+        // Get uri
+        Uri currentWallpaperUri = MyFileHandler.getCurrentWallpaperUri(requireContext());
 
         // Check file name cache
         if (getMyApplication(requireContext()).wallpaperFileName == null) {
             // Set from uri
-            getMyApplication(requireContext()).wallpaperFileName = MyFileHandler.getNameFromWallpaperUri(requireContext(), lastWallpaperUri);
+            getMyApplication(requireContext()).wallpaperFileName = MyFileHandler.getNameFromWallpaperUri(requireContext(), currentWallpaperUri);
         }
         setCurrentWallpaperName(getMyApplication(requireContext()).wallpaperFileName);
 
         // Check last wallpaper drawable cache
         if (getMyApplication(requireContext()).wallpaperDrawableCache == null) {
             // Set from uri
-            getMyApplication(requireContext()).wallpaperDrawableCache = MyFileHandler.getDrawableFromWallpaperUri(requireContext(), lastWallpaperUri);
+            getMyApplication(requireContext()).wallpaperDrawableCache = MyFileHandler.getDrawableFromWallpaperUri(requireContext(), currentWallpaperUri);
         }
         frameLayout.setBackground(getMyApplication(requireContext()).wallpaperDrawableCache);
     }
@@ -120,15 +73,13 @@ public class HomeFragment extends Fragment {
         super.onResume();
 
         // Check if uri is still valid
-        if (!MyFileHandler.isWallpaperDirValid(requireContext())) {
-            buttonSetRandomWallpaper.setEnabled(false);
-        }
+        buttonSetRandomWallpaper.setEnabled(MyFileHandler.isWallpaperDirValid(requireContext()));
 
         // Register Listeners
         sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
 
-        // Load from cache
-        setFromCache();
+        // Update Preferences
+        updatePreferenceValues();
     }
 
     @Override
@@ -144,7 +95,7 @@ public class HomeFragment extends Fragment {
         buttonSetRandomWallpaper = requireView().findViewById(R.id.button_set_random_wallpaper);
         buttonSetRandomWallpaper.setOnClickListener(v -> {
             // Set file as wallpaper
-            DocumentFile file = MyFileHandler.setRandomFileAsWallpaper(requireContext(), getMyApplication(requireContext()).wallpaperDir);
+            DocumentFile file = MyFileHandler.setRandomFileAsWallpaper(requireContext(), MyFileHandler.getWallpaperDirUri(requireContext()));
             if (file != null) {
                 String fileName = file.getName();
                 // Display file name
@@ -167,34 +118,6 @@ public class HomeFragment extends Fragment {
         setCurrentWallpaperName("-");
 
         frameLayout = requireView().findViewById(R.id.frame_layout_home_fragment);
-
-        switchAutoChange = requireView().findViewById(R.id.switch_enable_auto_change);
-        switchAutoChange.setOnClickListener(v -> {
-            boolean isEnabled = ((SwitchCompat) v).isChecked();
-            sharedPreferences.edit().
-                    putBoolean(getString(R.string.key_auto_change_enabled), isEnabled).
-                    apply();
-            if (isEnabled) {
-                // Start Work
-                startWorker();
-            } else {
-                // Stop Work
-                WorkManager.getInstance(requireContext()).cancelUniqueWork(getString(R.string.worker_tag_auto_wallpaper_changer));
-            }
-        });
-    }
-
-    private void startWorker() { // Use AlarmManager (inexact but when idle) for better scheduling
-        PeriodicWorkRequest autoWallpaperChangerWorkRequest =
-                new PeriodicWorkRequest.Builder(AutoWallpaperChangerWorker.class, 15, TimeUnit.MINUTES).
-                        setInitialDelay(5, TimeUnit.SECONDS).
-                        addTag(getString(R.string.worker_tag_auto_wallpaper_changer)).
-                        build();
-        WorkManager.getInstance(requireContext()).
-                enqueueUniquePeriodicWork(
-                        getString(R.string.worker_tag_auto_wallpaper_changer),
-                        ExistingPeriodicWorkPolicy.KEEP,
-                        autoWallpaperChangerWorkRequest);
     }
 
     private void setCurrentWallpaperName(String fileName) {

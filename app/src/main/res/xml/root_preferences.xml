@@ -12,7 +12,7 @@
     <PreferenceCategory app:title="@string/preference_category_automatic_mode_string">
 
         <Preference
-            app:key="@string/key_interval_start_time"
+            app:key="@string/key_automatic_interval"
             app:title="@string/preference_interval_start_time_string"
             app:summary="@string/preference_interval_start_time_summary_string" />
 

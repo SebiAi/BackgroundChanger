@@ -43,6 +43,7 @@ public class InfoFragment extends PreferenceFragmentCompat implements QuestionDi
 
         // Register Listeners
         sharedPreferences.registerOnSharedPreferenceChangeListener(this::onSharedPreferenceChangeListener);
+        updatePreferenceValues();
     }
 
     @Override
@@ -65,14 +66,13 @@ public class InfoFragment extends PreferenceFragmentCompat implements QuestionDi
             preferenceAmountPictures.setOnPreferenceClickListener(this::onPreferenceClick);
         }
         sharedPreferences.edit().
-                putInt(getString(R.string.key_amount_pictures), MyFileHandler.getFiles(requireContext(), getMyApplication(requireContext()).wallpaperDir).size()).
+                putInt(getString(R.string.key_amount_pictures), MyFileHandler.getFiles(requireContext(), MyFileHandler.getWallpaperDirUri(requireContext())).size()).
                 apply();
 
         preferenceAmountChanges = findPreference(getString(R.string.key_amount_changes));
         if (preferenceAmountChanges != null) {
             preferenceAmountChanges.setOnPreferenceClickListener(this::onPreferenceClick);
         }
-        updatePreferenceValues();
     }
 
     private void onSharedPreferenceChangeListener(SharedPreferences sharedPreferences, String key) {
@@ -114,6 +114,11 @@ public class InfoFragment extends PreferenceFragmentCompat implements QuestionDi
 
     private void updatePreferenceValues() {
         // Current Wallpaper Name
+        Uri currentWallpaperUri = MyFileHandler.getCurrentWallpaperUri(requireContext());
+        if (getMyApplication(requireContext()).wallpaperFileName == null) {
+            // Set from uri
+            getMyApplication(requireContext()).wallpaperFileName = MyFileHandler.getNameFromWallpaperUri(requireContext(), currentWallpaperUri);
+        }
         setPreferenceTitle(preferenceCurrentPictureName, String.format(getString(R.string.preference_current_picture_string),
                 getMyApplication(requireContext()).wallpaperFileName));
 

@@ -43,8 +43,7 @@
     <string name="preference_wallpaper_dir_string">Wallpaper directory</string>
     <string name="preference_wallpaper_dir_summary_string">%s\nClick to change</string>
     <string name="preference_category_automatic_mode_string">Automatic Mode</string>
-    <string name="key_interval_time">intervalTime</string>
-    <string name="key_interval_start_time">intervalStartTime</string>
+    <string name="key_automatic_interval">automaticInterval</string>
     <string name="preference_interval_start_time_string">Change interval</string>
     <string name="preference_interval_start_time_summary_string">Changing every %dh %dm\nStarting at %02d:%02d o\'clock\nClick to change</string>
     <string name="dialog_heading_start_time">Start time:</string>
