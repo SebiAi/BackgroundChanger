@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
@@ -32,6 +33,8 @@ public class HomeFragment extends Fragment {
 
     private SharedPreferences sharedPreferences;
 
+    private Lifecycle.State lastState;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -47,6 +50,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setup();
+        lastState = this.getLifecycle().getCurrentState();
     }
 
     private void updatePreferenceValues() {
@@ -79,7 +83,9 @@ public class HomeFragment extends Fragment {
         sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
 
         // Update Preferences
-        updatePreferenceValues();
+        if (lastState == Lifecycle.State.STARTED)
+            updatePreferenceValues();
+        lastState = this.getLifecycle().getCurrentState();
     }
 
     @Override
@@ -118,6 +124,8 @@ public class HomeFragment extends Fragment {
         setCurrentWallpaperName("-");
 
         frameLayout = requireView().findViewById(R.id.frame_layout_home_fragment);
+
+        updatePreferenceValues();
     }
 
     private void setCurrentWallpaperName(String fileName) {

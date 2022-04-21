@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Lifecycle;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
@@ -25,6 +26,8 @@ public class InfoFragment extends PreferenceFragmentCompat implements QuestionDi
     private Preference preferenceAmountPictures;
     private Preference preferenceAmountChanges;
 
+    private Lifecycle.State lastState;
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.info_preferences, rootKey);
@@ -35,6 +38,7 @@ public class InfoFragment extends PreferenceFragmentCompat implements QuestionDi
         super.onCreate(savedInstanceState);
 
         setup();
+        lastState = this.getLifecycle().getCurrentState();
     }
 
     @Override
@@ -43,7 +47,10 @@ public class InfoFragment extends PreferenceFragmentCompat implements QuestionDi
 
         // Register Listeners
         sharedPreferences.registerOnSharedPreferenceChangeListener(this::onSharedPreferenceChangeListener);
-        updatePreferenceValues();
+
+        if (lastState == Lifecycle.State.STARTED)
+            updatePreferenceValues();
+        lastState = this.getLifecycle().getCurrentState();
     }
 
     @Override
@@ -73,6 +80,8 @@ public class InfoFragment extends PreferenceFragmentCompat implements QuestionDi
         if (preferenceAmountChanges != null) {
             preferenceAmountChanges.setOnPreferenceClickListener(this::onPreferenceClick);
         }
+
+        updatePreferenceValues();
     }
 
     private void onSharedPreferenceChangeListener(SharedPreferences sharedPreferences, String key) {
@@ -80,8 +89,8 @@ public class InfoFragment extends PreferenceFragmentCompat implements QuestionDi
             return;
         if (key.equals(getString(R.string.key_current_picture))) {
             // Update name
-            Uri lastWallpaperUri = Uri.parse(sharedPreferences.getString(getString(R.string.key_current_picture), null));
-            getMyApplication(requireContext()).wallpaperFileName = MyFileHandler.getNameFromWallpaperUri(requireContext(), lastWallpaperUri);
+            Uri currentWallpaperUri = MyFileHandler.getCurrentWallpaperUri(requireContext());
+            getMyApplication(requireContext()).wallpaperFileName = MyFileHandler.getNameFromWallpaperUri(requireContext(), currentWallpaperUri);
             setPreferenceTitle(preferenceCurrentPictureName, String.format(getString(R.string.preference_current_picture_string),
                     getMyApplication(requireContext()).wallpaperFileName));
         } else if (key.equals(getString(R.string.key_amount_pictures))) {

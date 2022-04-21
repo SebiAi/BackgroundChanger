@@ -11,6 +11,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.lifecycle.Lifecycle;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
@@ -37,6 +38,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Config
 
     private Preference preferenceWallpaperDir;
     private Preference preferenceIntervalTime;
+
+    private Lifecycle.State lastState;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -73,13 +76,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Config
             // Enable toggle switch
             switchAutoChange.setEnabled(true);
         });
+
+        lastState = this.getLifecycle().getCurrentState();
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        updatePreferenceValues();
+        if (lastState == Lifecycle.State.STARTED)
+            updatePreferenceValues();
+        lastState = this.getLifecycle().getCurrentState();
     }
 
     private void setup() {
@@ -96,6 +103,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Config
         }
 
         switchAutoChange = requireActivity().findViewById(R.id.switch_enable_auto_change);
+
+        updatePreferenceValues();
     }
 
     private void setPreferenceSummary(Preference preference, String summary) {
