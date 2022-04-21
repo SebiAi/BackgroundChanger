@@ -147,7 +147,7 @@ public class InfoFragment extends PreferenceFragmentCompat implements QuestionDi
                 startActivity(Intent.createChooser(intent, getString(R.string.view_image_string)));
                 return true;
             case "amountPictures":
-                // TODO: Implement me
+                // TODO: Implement other activity which displays every picture
                 Toast.makeText(preference.getContext(), "Not implemented yet", Toast.LENGTH_SHORT).show();
                 return true;
             case "amountChanges":
