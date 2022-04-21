@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     remove(getString(R.string.key_wallpaper_dir)).
                     remove(getString(R.string.key_current_picture)).
                     remove(getString(R.string.key_auto_change_enabled)).
+                    remove(getString(R.string.key_amount_pictures)).
                     apply();
             // Clear cache
             getMyApplication(this).wallpaperDrawableCache = null;
