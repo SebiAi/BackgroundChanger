@@ -19,6 +19,8 @@ public final class FileUtil {
 
     private static final String PRIMARY_VOLUME_NAME = "primary";
 
+    // TODO: Doesn't work with all dirs (original post had a fix => search it)
+
     @Nullable
     public static String getFullPathFromTreeUri(@Nullable final Uri treeUri, Context con) {
         if (treeUri == null) return null;
