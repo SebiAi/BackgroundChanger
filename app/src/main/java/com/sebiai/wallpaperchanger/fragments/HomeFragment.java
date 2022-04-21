@@ -76,15 +76,16 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        // Check if uri is still valid
-        buttonSetRandomWallpaper.setEnabled(MyFileHandler.isWallpaperDirValid(requireContext()));
-
         // Register Listeners
         sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
 
-        // Update Preferences
-        if (lastState == Lifecycle.State.STARTED)
+        // If not previously updated by setup()
+        if (lastState == Lifecycle.State.STARTED) {
+            // Check if uri is still valid
+            buttonSetRandomWallpaper.setEnabled(MyFileHandler.isWallpaperDirValid(requireContext()));
+            // Update Preferences
             updatePreferenceValues();
+        }
         lastState = this.getLifecycle().getCurrentState();
     }
 
@@ -126,6 +127,9 @@ public class HomeFragment extends Fragment {
         frameLayout = requireView().findViewById(R.id.frame_layout_home_fragment);
 
         updatePreferenceValues();
+
+        // Check if uri is still valid
+        buttonSetRandomWallpaper.setEnabled(MyFileHandler.isWallpaperDirValid(requireContext()));
     }
 
     private void setCurrentWallpaperName(String fileName) {
