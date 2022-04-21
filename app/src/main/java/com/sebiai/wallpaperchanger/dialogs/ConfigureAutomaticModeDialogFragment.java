@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.NumberPicker;
 import android.widget.TimePicker;
 
@@ -20,6 +19,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.sebiai.wallpaperchanger.R;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
@@ -62,19 +62,8 @@ public class ConfigureAutomaticModeDialogFragment extends DialogFragment {
         // Get inflater
         LayoutInflater inflater = requireActivity().getLayoutInflater();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setView(inflater.inflate(R.layout.dialog_configure_automatic_mode, null)).
-                setPositiveButton(requireContext().getString(R.string.ok_string), (dialog, which) -> {
-                    isPositive = true;
-                    dialog.dismiss();
-                }).
-                setNegativeButton(requireContext().getString(R.string.cancel_string), (dialog, id) -> dialog.dismiss());
-        return builder.create();
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState); // TODO: [FIX ME] Does not get called somehow?? Why?
+        // Inflate view
+        View view = inflater.inflate(R.layout.dialog_configure_automatic_mode, null);
 
         // Get views
         numberPickerIntervalHours = view.findViewById(R.id.number_picker_interval_hours);
@@ -83,10 +72,11 @@ public class ConfigureAutomaticModeDialogFragment extends DialogFragment {
 
         // Set min/max values
         numberPickerIntervalHours.setMinValue(0);
-        numberPickerIntervalHours.setMaxValue(100);
+        numberPickerIntervalHours.setMaxValue(48);
         numberPickerIntervalHours.setValue(0);
         numberPickerIntervalMinutes.setMinValue(15); // Min time is 15 min
-        numberPickerIntervalMinutes.setMinValue(59);
+        numberPickerIntervalMinutes.setMaxValue(59);
+        numberPickerIntervalMinutes.setValue(15);
 
         // Set on change listeners
         numberPickerIntervalHours.setOnValueChangedListener((picker, oldVal, newVal) -> {
@@ -99,23 +89,41 @@ public class ConfigureAutomaticModeDialogFragment extends DialogFragment {
                 numberPickerIntervalMinutes.setMinValue(0);
             }
         });
+
+        // Build dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(view).
+                setPositiveButton(requireContext().getString(R.string.ok_string), (dialog, which) -> {
+                    isPositive = true;
+                    dialog.dismiss();
+                }).
+                setNegativeButton(requireContext().getString(R.string.cancel_string), (dialog, id) -> dialog.dismiss());
+        return builder.create();
     }
 
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         if (isPositive) {
-            Date intervalTime = null;
-            Date startTime = null;
+            // Define variables
+            Date intervalTime;
+            Date startTime;
 
-            // TODO: Implement mCallback for OnConfigureAutomaticModeDialogDismissListener
+            // Get intervalTime
+            intervalTime = getDate(numberPickerIntervalHours.getValue(), numberPickerIntervalMinutes.getValue());
+
+            // Get startTime
+            startTime = getDate(timePickerStartTime.getHour(), timePickerStartTime.getMinute());
 
             mCallback.onConfigureAutomaticModeDialogDismissListener(intervalTime, startTime);
         }
         super.onDismiss(dialog);
     }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+    private Date getDate(int hours, int minutes) {
+        Calendar c = Calendar.getInstance();
+        c.clear();
+        c.set(Calendar.HOUR, hours);
+        c.set(Calendar.MINUTE, minutes);
+        return c.getTime();
     }
 }
