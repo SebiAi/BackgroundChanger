@@ -184,7 +184,7 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void startWorker() {
+    private void startWorker() { // Use AlarmManager (inexact but when idle) for better scheduling
         PeriodicWorkRequest autoWallpaperChangerWorkRequest =
                 new PeriodicWorkRequest.Builder(AutoWallpaperChangerWorker.class, 15, TimeUnit.MINUTES).
                         setInitialDelay(5, TimeUnit.SECONDS).
