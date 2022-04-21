@@ -69,6 +69,7 @@ public class ConfigureAutomaticModeDialogFragment extends DialogFragment {
         numberPickerIntervalHours = view.findViewById(R.id.number_picker_interval_hours);
         numberPickerIntervalMinutes = view.findViewById(R.id.number_picker_interval_minutes);
         timePickerStartTime = view.findViewById(R.id.time_picker_start_time);
+        timePickerStartTime.setIs24HourView(true);
 
         // Set min/max values
         numberPickerIntervalHours.setMinValue(0);
