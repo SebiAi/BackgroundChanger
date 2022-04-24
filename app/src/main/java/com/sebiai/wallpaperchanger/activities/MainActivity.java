@@ -14,12 +14,9 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -53,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         // Test for optimization // TODO: Implement this in setup process (https://stackoverflow.com/questions/39256501/check-if-battery-optimization-is-enabled-or-not-for-an-app)
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        boolean isIgnoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
-        Toast.makeText(getApplicationContext(), "Battery optimizations enabled: " + !isIgnoringBatteryOptimizations, Toast.LENGTH_LONG).show();
+//        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+//        boolean isIgnoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
+//        Toast.makeText(getApplicationContext(), "Battery optimizations enabled: " + !isIgnoringBatteryOptimizations, Toast.LENGTH_LONG).show();
 
         // Check if uri is still valid
         if (!MyFileHandler.isWallpaperDirValid(this)) {

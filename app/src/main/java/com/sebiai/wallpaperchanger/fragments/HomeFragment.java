@@ -17,9 +17,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.TextView;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.sebiai.wallpaperchanger.utils.MyFileHandler;
 import com.sebiai.wallpaperchanger.R;
 
@@ -28,12 +29,16 @@ import com.sebiai.wallpaperchanger.R;
  */
 public class HomeFragment extends Fragment {
     private Button buttonSetRandomWallpaper;
-    private TextView textViewCurrentWallpaper;
-    private FrameLayout frameLayout;
+    private ImageView imageViewWallpaper;
 
     private SharedPreferences sharedPreferences;
 
     private Lifecycle.State lastState;
+
+    RequestOptions options = new RequestOptions()
+            .centerCrop()
+            .placeholder(R.drawable.default_wallpaper)
+            .error(R.drawable.default_wallpaper);
 
     public HomeFragment() {
         // Required empty public constructor
@@ -57,19 +62,12 @@ public class HomeFragment extends Fragment {
         // Get uri
         Uri currentWallpaperUri = MyFileHandler.getCurrentWallpaperUri(requireContext());
 
-        // Check file name cache
-        if (getMyApplication(requireContext()).wallpaperFileName == null) {
-            // Set from uri
-            getMyApplication(requireContext()).wallpaperFileName = MyFileHandler.getNameFromWallpaperUri(requireContext(), currentWallpaperUri);
-        }
-        setCurrentWallpaperName(getMyApplication(requireContext()).wallpaperFileName);
-
         // Check last wallpaper drawable cache
         if (getMyApplication(requireContext()).wallpaperDrawableCache == null) {
             // Set from uri
             getMyApplication(requireContext()).wallpaperDrawableCache = MyFileHandler.getDrawableFromWallpaperUri(requireContext(), currentWallpaperUri);
         }
-        frameLayout.setBackground(getMyApplication(requireContext()).wallpaperDrawableCache);
+        setWallpaper();
     }
 
     @Override
@@ -105,8 +103,6 @@ public class HomeFragment extends Fragment {
             DocumentFile file = MyFileHandler.setRandomFileAsWallpaper(requireContext(), MyFileHandler.getWallpaperDirUri(requireContext()));
             if (file != null) {
                 String fileName = file.getName();
-                // Display file name
-                setCurrentWallpaperName(fileName);
                 // Save preferences
                 int amountChangesManual = sharedPreferences.getInt(getString(R.string.key_amount_changes_manual), 0);
                 sharedPreferences.edit().
@@ -117,14 +113,11 @@ public class HomeFragment extends Fragment {
                 getMyApplication(requireContext()).wallpaperDrawableCache = MyFileHandler.getDrawableFromWallpaperUri(requireContext(), file.getUri());
                 getMyApplication(requireContext()).wallpaperFileName = fileName;
                 // Set wallpaper as fragment background
-                frameLayout.setBackground(getMyApplication(requireContext()).wallpaperDrawableCache);
+                setWallpaper();
             }
         });
 
-        textViewCurrentWallpaper = requireView().findViewById(R.id.textview_current_wallpaper);
-        setCurrentWallpaperName("-");
-
-        frameLayout = requireView().findViewById(R.id.frame_layout_home_fragment);
+        imageViewWallpaper = requireView().findViewById(R.id.image_view_wallpaper);
 
         updatePreferenceValues();
 
@@ -132,22 +125,17 @@ public class HomeFragment extends Fragment {
         buttonSetRandomWallpaper.setEnabled(MyFileHandler.isWallpaperDirValid(requireContext()));
     }
 
-    private void setCurrentWallpaperName(String fileName) {
-        textViewCurrentWallpaper.setText(String.format(getString(R.string.textview_current_wallpaper_string), fileName));
+    private void setWallpaper() {
+        if (getMyApplication(requireContext()).wallpaperDrawableCache != null)
+            Glide.with(requireContext()).load(getMyApplication(requireContext()).wallpaperDrawableCache).apply(options).into(imageViewWallpaper);
     }
 
-    SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals(getString(R.string.key_current_picture))) {
-                Uri lastWallpaperUri = Uri.parse(sharedPreferences.getString(getString(R.string.key_current_picture), null));
-                // Update name
-                getMyApplication(requireContext()).wallpaperFileName = MyFileHandler.getNameFromWallpaperUri(requireContext(), lastWallpaperUri);
-                setCurrentWallpaperName(getMyApplication(requireContext()).wallpaperFileName);
-                // Update drawable
-                getMyApplication(requireContext()).wallpaperDrawableCache = MyFileHandler.getDrawableFromWallpaperUri(requireContext(), lastWallpaperUri);
-                frameLayout.setBackground(getMyApplication(requireContext()).wallpaperDrawableCache);
-            }
+    SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener = (sharedPreferences, key) -> {
+        if (key.equals(getString(R.string.key_current_picture))) {
+            Uri lastWallpaperUri = Uri.parse(sharedPreferences.getString(getString(R.string.key_current_picture), null));
+            // Update drawable
+            getMyApplication(requireContext()).wallpaperDrawableCache = MyFileHandler.getDrawableFromWallpaperUri(requireContext(), lastWallpaperUri);
+            setWallpaper();
         }
     };
 }

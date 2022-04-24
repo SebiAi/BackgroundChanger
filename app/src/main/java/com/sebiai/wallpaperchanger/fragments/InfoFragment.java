@@ -15,6 +15,7 @@ import androidx.preference.PreferenceManager;
 
 import android.widget.Toast;
 
+import com.sebiai.wallpaperchanger.activities.ImageBrowserActivity;
 import com.sebiai.wallpaperchanger.utils.MyFileHandler;
 import com.sebiai.wallpaperchanger.R;
 import com.sebiai.wallpaperchanger.dialogs.QuestionDialogFragment;
@@ -161,8 +162,12 @@ public class InfoFragment extends PreferenceFragmentCompat implements QuestionDi
                 startActivity(Intent.createChooser(intent, getString(R.string.view_image_string)));
                 return true;
             case "amountPictures":
-                // TODO: Implement other activity which displays every picture
-                Toast.makeText(preference.getContext(), "Not implemented yet", Toast.LENGTH_SHORT).show();
+                int amountWallpapers = sharedPreferences.getInt(getString(R.string.key_amount_pictures), 0);
+                if (amountWallpapers == 0)
+                    return true;
+
+                Intent imageBrowserIntent = new Intent(requireContext(), ImageBrowserActivity.class);
+                startActivity(imageBrowserIntent);
                 return true;
             case "amountChanges":
                 QuestionDialogFragment dialog = new QuestionDialogFragment(getString(R.string.question_title_reset_amount_changes),

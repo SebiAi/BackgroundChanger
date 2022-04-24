@@ -61,6 +61,10 @@ public class MyFileHandler {
         return uris;
     }
 
+    public static ArrayList<Uri> getFiles(Context context) {
+        return getFiles(context, getWallpaperDirUri(context));
+    }
+
     public static DocumentFile getRandomFile(Context context, ArrayList<Uri> uris) {
         if (uris.size() != 0) {
             Random random = new Random();
