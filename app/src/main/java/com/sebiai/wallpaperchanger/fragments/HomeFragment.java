@@ -20,7 +20,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.sebiai.wallpaperchanger.MyFileHandler;
+import com.sebiai.wallpaperchanger.utils.MyFileHandler;
 import com.sebiai.wallpaperchanger.R;
 
 /**

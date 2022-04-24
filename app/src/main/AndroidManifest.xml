@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WallpaperChanger">
         <activity
-            android:name="com.sebiai.wallpaperchanger.MainActivity"
+            android:name="com.sebiai.wallpaperchanger.activities.MainActivity"
             android:screenOrientation="sensorPortrait"
             android:exported="true"
             tools:ignore="LockedOrientationActivity">

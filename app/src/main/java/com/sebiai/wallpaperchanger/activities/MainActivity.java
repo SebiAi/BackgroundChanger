@@ -1,4 +1,4 @@
-package com.sebiai.wallpaperchanger;
+package com.sebiai.wallpaperchanger.activities;
 
 import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
 
@@ -23,7 +23,9 @@ import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.sebiai.wallpaperchanger.worker.AutoWallpaperChangerWorker;
+import com.sebiai.wallpaperchanger.R;
+import com.sebiai.wallpaperchanger.utils.MyFileHandler;
+import com.sebiai.wallpaperchanger.workers.AutoWallpaperChangerWorker;
 
 import java.util.List;
 import java.util.Objects;

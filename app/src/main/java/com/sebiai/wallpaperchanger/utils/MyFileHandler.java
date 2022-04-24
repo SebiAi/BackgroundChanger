@@ -1,6 +1,4 @@
-package com.sebiai.wallpaperchanger;
-
-import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
+package com.sebiai.wallpaperchanger.utils;
 
 import android.app.WallpaperManager;
 import android.content.Context;
@@ -12,6 +10,8 @@ import android.provider.DocumentsContract;
 
 import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.PreferenceManager;
+
+import com.sebiai.wallpaperchanger.R;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package com.sebiai.wallpaperchanger.worker;
+package com.sebiai.wallpaperchanger.workers;
 
 import static com.sebiai.wallpaperchanger.MyApplicationHelper.getMyApplication;
 
@@ -13,7 +13,7 @@ import androidx.preference.PreferenceManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.sebiai.wallpaperchanger.MyFileHandler;
+import com.sebiai.wallpaperchanger.utils.MyFileHandler;
 import com.sebiai.wallpaperchanger.R;
 
 import java.io.IOException;

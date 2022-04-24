@@ -16,10 +16,11 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
-import com.sebiai.wallpaperchanger.MyFileHandler;
+import com.sebiai.wallpaperchanger.utils.MyFileHandler;
 import com.sebiai.wallpaperchanger.R;
 import com.sebiai.wallpaperchanger.dialogs.ConfigureAutomaticModeDialogFragment;
 import com.sebiai.wallpaperchanger.objects.AutomaticIntervalContainer;
+import com.sebiai.wallpaperchanger.utils.FileUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

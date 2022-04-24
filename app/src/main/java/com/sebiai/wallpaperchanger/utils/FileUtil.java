@@ -1,4 +1,4 @@
-package com.sebiai.wallpaperchanger.fragments;
+package com.sebiai.wallpaperchanger.utils;
 
 import android.annotation.TargetApi;
 import android.content.Context;

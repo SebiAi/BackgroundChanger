@@ -15,7 +15,7 @@ import androidx.preference.PreferenceManager;
 
 import android.widget.Toast;
 
-import com.sebiai.wallpaperchanger.MyFileHandler;
+import com.sebiai.wallpaperchanger.utils.MyFileHandler;
 import com.sebiai.wallpaperchanger.R;
 import com.sebiai.wallpaperchanger.dialogs.QuestionDialogFragment;
 
