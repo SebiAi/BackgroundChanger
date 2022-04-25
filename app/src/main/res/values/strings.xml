@@ -51,4 +51,7 @@
     <string name="dialog_hour_string">hrs</string>
     <string name="dialog_minute_string">mins</string>
 
+    <!-- Image Activity -->
+    <string name="button_select_wallpaper_string">Select Wallpaper</string>
+
 </resources>

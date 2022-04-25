@@ -24,7 +24,8 @@
             android:src="@drawable/test_wallpaper"
             tools:ignore="HardcodedText"
             android:contentDescription="Wallpaper"
-            app:layout_constraintDimensionRatio="9:16" />
+            app:layout_constraintDimensionRatio="9:16"
+            android:transitionName="fade"/>
 
         <View
             android:id="@+id/view_bottom_image_fade"
