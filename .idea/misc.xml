@@ -22,6 +22,9 @@
         <entry key="..\:/Users/Sebastian/StudioProjects/WallpaperChanger/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.196" />
         <entry key="..\:/Users/Sebastian/StudioProjects/WallpaperChanger/app/src/main/res/xml/info_preferences.xml" value="0.358695652173913" />
         <entry key="..\:/Users/Sebastian/StudioProjects/WallpaperChanger/app/src/main/res/xml/root_preferences.xml" value="0.358695652173913" />
+        <entry key="app/src/main/res/layout/activity_image.xml" value="0.184375" />
+        <entry key="app/src/main/res/layout/activity_image_browser.xml" value="0.17426545086119555" />
+        <entry key="app/src/main/res/layout/recyclerview_image_item.xml" value="0.35597826086956524" />
       </map>
     </option>
   </component>

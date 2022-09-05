@@ -21,7 +21,6 @@
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
-            android:src="@drawable/test_wallpaper"
             tools:ignore="HardcodedText"
             android:contentDescription="Wallpaper"
             app:layout_constraintDimensionRatio="9:16"

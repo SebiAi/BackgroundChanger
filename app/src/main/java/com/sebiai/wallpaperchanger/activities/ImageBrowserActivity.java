@@ -80,7 +80,7 @@ public class ImageBrowserActivity extends AppCompatActivity implements Wallpaper
         Bundle bundle = new Bundle();
         bundle.putString("wallpaper", wallpaper.toString());
         intent.putExtras(bundle);
-        //startActivity(intent, options.toBundle());
-        startActivity(intent);
+        startActivity(intent, options.toBundle());
+        //startActivity(intent);
     }
 }
